@@ -80,16 +80,16 @@ RUN rm -rf /usr/share/logstash/jdk
 RUN /usr/share/logstash/bin/logstash-plugin install logstash-filter-translate
 RUN /usr/share/logstash/bin/logstash-plugin install logstash-output-syslog
 RUN mkdir -p /etc/logstash/conf.d/
-RUN cp /root/dist/logstash.conf /etc/logstash/conf.d/logstash.conf
-RUN cp /root/dist/tpot_es_template.json /etc/logstash/tpot_es_template.json
-RUN cp /root/dist/update.sh /usr/bin/
+ADD /dist/logstash.conf /etc/logstash/conf.d/logstash.conf
+ADD /dist/tpot_es_template.json /etc/logstash/tpot_es_template.json
+ADD /dist/update.sh /usr/bin/
 RUN chmod 755 /usr/bin/update.sh
 
 RUN mkdir -p /home/cowrie/cowrie/etc &&\
     mkdir /home/cowrie/cowrie/log &&\
     mkdir /home/cowrie/cowrie/log/tty
 RUN chown -R cowrie:cowrie /home/cowrie
-RUN cp /root/dist/services.sh /services.sh
+ADD /dist/services.sh /services.sh
 RUN chown cowrie:cowrie /services.sh
 RUN chmod +x /services.sh
 RUN apk del --purge -y && \
