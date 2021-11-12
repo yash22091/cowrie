@@ -18,9 +18,5 @@ services:
     ports:
      - "22:22"
      - "23:23"
-    image: "dtagdevsec/cowrie:2006"
-#    read_only: true
-#    volumes:
-#     - /data/cowrie/keys:/home/cowrie/cowrie/etc
-#     - /data/cowrie/log:/home/cowrie/cowrie/log
-#     - /data/cowrie/log/tty:/home/cowrie/cowrie/log/tty
+    image: "ghcr.io/telekom-security/cowrie:2006"
+    read_only: true
