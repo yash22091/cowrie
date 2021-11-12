@@ -4,7 +4,9 @@
 sed -i -e 's/wazuh-user/'"$user"'/g' -e 's/wazuh-password/'"$password"'/g' -e 's/IP/'"$ip"'/g' /usr/bin/update.sh &
 sed -i -e 's/wazuh-user/'"$user"'/g' -e 's/wazuh-password/'"$password"'/g' -e 's/IP/'"$ip"'/g' /etc/logstash/conf.d/logstash.conf &
 ##
-/usr/bin/twistd --nodaemon -y cowrie.tac --pidfile /tmp/cowrie/cowrie.pid cowrie & 
+su - cowrie -c "export PYTHONPATH=/home/cowrie/cowrie:/home/cowrie/cowrie/src && \
+                    cd /home/cowrie/cowrie && \
+                    /usr/bin/twistd --uid=2000 --gid=2000 -y cowrie.tac --pidfile cowrie.pid cowrie &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start my_first_process: $status"
