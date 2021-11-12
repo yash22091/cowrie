@@ -17,6 +17,9 @@ RUN apk -U add \
              openssl-dev \
              py3-pip \
              python3 \
+             openjdk11 \
+             aria2 \
+             bzip2 \
              python3-dev && \
 #
 # Setup user
@@ -63,15 +66,13 @@ RUN apk -U add \
     rm -rf /home/cowrie/cowrie/cowrie.pid && \
     unset PYTHON_DIR
 
-RUN apt-get update && \
-apt-get install -y --no-install-recommends \
-        openjdk-11-jre aria2 bzip2
 RUN mkdir -p /etc/listbot &&\
     cd /etc/listbot \
     aria2c -s16 -x 16 https://listbot.sicherheitstacho.eu/cve.yaml.bz2 &&\
     aria2c -s16 -x 16 https://listbot.sicherheitstacho.eu/iprep.yaml.bz2 &&\
     bunzip2 *.bz2
 
+RUN set JAVA_OPTS="-Xms100m -Xmx100m" "-XX:PermSize=32m" "-XX:MaxPermSize=64m" "-XX:+HeapDumpOnOutOfMemoryError"
 RUN mkdir -p /usr/share/logstash
 RUN aria2c -s 16 -x 16 https://artifacts.elastic.co/downloads/logstash/logstash-oss-7.10.2-linux-x86_64.tar.gz
 RUN tar xvfz logstash-oss-7.10.2-linux-x86_64.tar.gz --strip-components=1 -C /usr/share/logstash/
@@ -80,9 +81,9 @@ RUN /usr/share/logstash/bin/logstash-plugin install logstash-filter-translate
 RUN /usr/share/logstash/bin/logstash-plugin install logstash-output-syslog
 RUN mkdir -p /etc/logstash/conf.d/
 RUN cp /root/dist/logstash.conf /etc/logstash/conf.d/logstash.conf
-RUN cp /root/dist/tpot_es_template.json /etc/logstash/tpot_es_template.json 
+RUN cp /root/dist/tpot_es_template.json /etc/logstash/tpot_es_template.json
 RUN cp /root/dist/update.sh /usr/bin/
-RUN chmod 755 /usr/bin/update.sh 
+RUN chmod 755 /usr/bin/update.sh
 
 RUN mkdir -p /home/cowrie/cowrie/etc &&\
     mkdir /home/cowrie/cowrie/log &&\
@@ -91,8 +92,7 @@ RUN chown -R cowrie:cowrie /home/cowrie
 RUN cp /root/dist/services.sh /services.sh
 RUN chown cowrie:cowrie /services.sh
 RUN chmod +x /services.sh
-RUN apt-get autoremove --purge -y && \
-    apt-get clean && \
+RUN apk del --purge -y && \
+    apk clean && \
     rm -rf /logstash-oss-7.10.2-linux-x86_64.tar.gz /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ENTRYPOINT ["./services.sh"]
-
